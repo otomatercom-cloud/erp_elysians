@@ -79,7 +79,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <div className="shell">
       <button className="burger" onClick={() => setMenu(!menu)} aria-label="Menu"><Menu size={20} /></button>
       <nav className={`side ${menu ? 'open' : ''}`}>
-        <div className="brand"><Logo height={36} badge name={process.env.NEXT_PUBLIC_APP_NAME || 'otomater'} sub="Sales & Project Lifecycle" /></div>
+        <div className="brand"><Logo height={36} name={process.env.NEXT_PUBLIC_APP_NAME || 'otomater'} sub="Sales & Project Lifecycle" /></div>
         <Link href="/" className={on('/') ? 'on' : ''}><Ico k="dashboard" />Dashboard</Link>
         {!allowed && <div className="side-skel"><i /><i /><i /><i /><i /><i /></div>}
         {allowed && GROUPS.map((g) => {

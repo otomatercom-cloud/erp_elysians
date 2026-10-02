@@ -316,3 +316,5 @@ kbd { font: inherit; font-size: .68rem; border: 1px solid var(--line); border-ra
 .side-skel i { height: 14px; border-radius: 6px; background: linear-gradient(90deg, #131c31, #1c2742, #131c31); background-size: 200% 100%; animation: skel 1.2s linear infinite; }
 .side-skel i:nth-child(odd) { width: 80%; }
 @keyframes skel { to { background-position: -200% 0; } }
+.login-logo-mobile { background: #0b1220; border-radius: 14px; padding: 10px 16px; width: fit-content; }
+.m2o-opt.create { color: #4f46e5; font-weight: 700; border-top: 1px solid var(--line, #e5e7eb); }

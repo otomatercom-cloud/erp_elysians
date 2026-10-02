@@ -22,7 +22,7 @@ export default function Login() {
   return (
     <main className="login">
       <section className="login-hero">
-        <div className="brand-lg"><Logo height={50} badge name={process.env.NEXT_PUBLIC_APP_NAME || 'otomater'} /></div>
+        <div className="brand-lg"><Logo height={50} name={process.env.NEXT_PUBLIC_APP_NAME || 'otomater'} /></div>
         <h2>From first lead to final delivery — in one place.</h2>
         <ul>
           <li>Leads, demos, estimates and deals</li>

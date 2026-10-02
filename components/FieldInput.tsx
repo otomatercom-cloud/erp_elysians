@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { FieldDef, nameSearch } from '@/lib/odoo';
+import { FieldDef, nameSearch, rpc } from '@/lib/odoo';
+import { useToast } from './ui';
 import { fmt } from '@/lib/util';
 
 export type Pair = [number, string];
@@ -33,6 +34,17 @@ function M2O({ rel, value, onChange, disabled }: { rel: string; value: any; onCh
   const [opts, setOpts] = useState<Pair[]>([]);
   const [open, setOpen] = useState(false);
   const t = useRef<any>(null);
+  const { push } = useToast();
+  // customers can be created on the spot when the name is not in the list
+  const canCreate = rel === 'res.partner';
+  const typed = term.trim();
+  const exact = opts.some((o) => o[1].trim().toLowerCase() === typed.toLowerCase());
+  async function createNew() {
+    try {
+      const pair = await rpc<Pair>('otm.lead', 'otm_create_customer', [], { name: typed });
+      onChange(pair); setOpen(false); push(`Customer "${typed}" created`);
+    } catch (e: any) { push(e.message || 'Could not create the customer', 'err'); }
+  }
   useEffect(() => {
     if (!open) return;
     clearTimeout(t.current);
@@ -49,7 +61,8 @@ function M2O({ rel, value, onChange, disabled }: { rel: string; value: any; onCh
         <div className="m2o-list">
           {Array.isArray(value) && <div className="m2o-opt muted" onMouseDown={() => { onChange(false); setOpen(false); }}>— clear —</div>}
           {opts.map((o) => <div key={o[0]} className="m2o-opt" onMouseDown={() => { onChange(o); setOpen(false); }}>{o[1]}</div>)}
-          {!opts.length && <div className="m2o-opt muted">No result</div>}
+          {canCreate && typed && !exact && <div className="m2o-opt create" onMouseDown={createNew}>+ Create customer “{typed}”</div>}
+          {!opts.length && !(canCreate && typed) && <div className="m2o-opt muted">No result</div>}
         </div>
       )}
     </div>
