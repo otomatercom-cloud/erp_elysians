@@ -23,11 +23,11 @@ export default function Bell() {
   const load = useCallback(() => { rpc<N[]>('otm.dashboard', 'get_notifications', [30]).then(setItems).catch(() => {}); }, []);
   useEffect(() => {
     try { setSeen(Number(localStorage.getItem(KEY) || 0)); } catch { /* ignore */ }
-    load();
+    const first = setTimeout(load, 2500); // let the page's own data load first
     const t = setInterval(load, 60000);
     const off = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', off);
-    return () => { clearInterval(t); document.removeEventListener('mousedown', off); };
+    return () => { clearTimeout(first); clearInterval(t); document.removeEventListener('mousedown', off); };
   }, [load]);
 
   const unread = items.filter((n) => n.id > seen).length;

@@ -2,9 +2,11 @@ import './globals.css';
 import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui';
 
+export const viewport = { themeColor: '#4f46e5' };
+
 export const metadata = {
   title: 'Otomater · Sales & Project Lifecycle', description: 'Lead to delivery, in one place',
-  manifest: '/manifest.webmanifest', themeColor: '#4f46e5',
+  manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Otomater', statusBarStyle: 'default' as const },
   icons: { icon: '/icon-192.png', apple: '/icon-192.png' },
 };

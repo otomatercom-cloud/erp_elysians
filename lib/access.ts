@@ -1,6 +1,5 @@
 'use client';
 import { CONFIG } from './config';
-import { rpc } from './odoo';
 
 let cache: Promise<Set<string>> | null = null;
 const KEY = (uid: number) => `otm.access.${uid}`;
@@ -16,13 +15,16 @@ export function cachedAccess(): Set<string> | null {
 /** Models the signed-in user may read (Odoo's own access rights decide). Always re-checked once per page load. */
 export function loadAccess(): Promise<Set<string>> {
   if (!cache) {
-    cache = Promise.all(CONFIG.map(async (c) => {
-      try { return (await rpc<boolean>(c.model, 'has_access', [[], 'read'])) ? c.model : null; } catch { return null; }
-    })).then((r) => {
-      const set = new Set(r.filter(Boolean) as string[]);
+    cache = fetch('/api/access', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ models: CONFIG.map((c) => c.model).concat(['project.project']) }),
+    }).then(async (r) => {
+      if (r.status === 401) { location.href = '/login'; return new Set<string>(); }
+      const j = await r.json();
+      const set = new Set<string>(j.models || []);
       try { localStorage.setItem(KEY(uidNow()), JSON.stringify([...set])); } catch { /* ignore */ }
       return set;
-    });
+    }).catch(() => { cache = null; return cachedAccess() || new Set<string>(); });
   }
   return cache;
 }

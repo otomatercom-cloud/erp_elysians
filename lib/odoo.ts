@@ -21,8 +21,12 @@ export type FieldDef = {
 const cache = new Map<string, Promise<Record<string, FieldDef>>>();
 export function fieldsGet(model: string) {
   if (!cache.has(model)) {
+    try { const c = sessionStorage.getItem('otm.fields.' + model); if (c) cache.set(model, Promise.resolve(JSON.parse(c))); } catch { /* ignore */ }
+  }
+  if (!cache.has(model)) {
     cache.set(model, rpc<Record<string, FieldDef>>(model, 'fields_get', [],
       { attributes: ['string', 'type', 'readonly', 'required', 'selection', 'relation', 'currency_field'] })
+      .then((d) => { try { sessionStorage.setItem('otm.fields.' + model, JSON.stringify(d)); } catch { /* ignore */ } return d; })
       .catch((e) => { cache.delete(model); throw e; }));
   }
   return cache.get(model)!;
