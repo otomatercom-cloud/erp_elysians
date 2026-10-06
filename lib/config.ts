@@ -16,7 +16,7 @@ export type Cfg = {
 
 export const CONFIG: Cfg[] = [
   {
-    slug: 'leads', model: 'otm.lead', title: 'Leads', singular: 'Lead', group: 'Sales', tracker: true,
+    slug: 'leads', model: 'otm.lead', title: 'Leads', singular: 'Lead', group: 'Sales', tracker: true, also: ['service_count', 'stage'],
     columns: ['reference', 'name', 'customer_id', 'sales_team_id', 'salesperson_id', 'lead_quality', 'expected_budget', 'followup_date', 'stage'],
     search: ['name', 'reference', 'company_name', 'contact_number'], order: 'id desc',
     create: ['name', 'customer_id', 'company_name', 'contact_number', 'whatsapp_number', 'email', 'location', 'lead_source_id',

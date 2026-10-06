@@ -7,7 +7,8 @@ import { Spinner, useToast } from './ui';
 type Section = { title: string; fields: string[] };
 
 /** Generic form: labels, types and selections are read from Odoo, so it works for every model. */
-export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday, extraPayload, beforeSave }: {
+export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday, extraPayload, beforeSave, beforeCreate }: {
+  beforeCreate?: () => Promise<void>;
   extraPayload?: Record<string, any>; beforeSave?: (vals: Record<string, any>) => string | null; prefillToday?: string[]; model: string; sections: Section[]; record?: any; defaults?: Record<string, any>; mode: 'edit' | 'create';
   onSaved: (id: number) => void; onDirty?: (d: boolean) => void;
 }) {
@@ -84,6 +85,7 @@ export function RecordForm({ model, sections, record, defaults, mode, onSaved, o
         Object.assign(payload, extraPayload || {});
         const missing = names.filter((n) => defs![n]?.required && !defs![n].readonly && (vals[n] === false || vals[n] === '' || vals[n] === undefined) && payload[n] === undefined);
         if (missing.length) throw new Error('Please fill: ' + missing.map((n) => defs![n].string).join(', '));
+        await beforeCreate?.();
         const id = await rpc<number>(model, 'create', [payload]);
         push('Created'); onSaved(Array.isArray(id) ? (id as any)[0] : id);
       } else {

@@ -11,6 +11,7 @@ import { ActionButtons } from '@/components/ActionBar';
 import Outreach from '@/components/Outreach';
 import { Chatter } from '@/components/Chatter';
 import { Checklist } from '@/components/Checklist';
+import { StepWizard } from '@/components/StepWizard';
 import { RecordForm } from '@/components/RecordForm';
 import { Related } from '@/components/Related';
 import { Badge, Spinner, useToast } from '@/components/ui';
@@ -64,7 +65,8 @@ export default function DetailPage() {
           {states.map((s) => <li key={s} className={s === rec[sf] ? 'now' : ''}>{SCHEMA[cfg.model].states[s]}</li>)}
         </ol>
       )}
-      {cfg.tracker && <Checklist steps={rec.otm_stage_tracker} />}
+      {cfg.slug === 'leads' && <StepWizard rec={rec} onDone={load} />}
+      {cfg.tracker && <Checklist steps={rec.otm_stage_tracker} defaultOpen={cfg.slug !== 'leads'} />}
       {tops.map((t) => (
         <section key={t.title} className="tabs-box top-card">
           <h3>{t.title}</h3>

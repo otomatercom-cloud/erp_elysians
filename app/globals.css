@@ -336,3 +336,16 @@ kbd { font: inherit; font-size: .68rem; border: 1px solid var(--line); border-ra
 .svc-row { display: grid; grid-template-columns: minmax(160px, 1.2fr) 80px 2fr 32px; gap: .5rem; margin-bottom: .5rem; align-items: center; }
 .svc-row select, .svc-row input { border: 1px solid var(--line); border-radius: 8px; padding: .45rem .6rem; font-family: inherit; font-size: .85rem; min-width: 0; }
 @media (max-width: 700px) { .svc-row { grid-template-columns: 1fr 70px 32px; } .svc-row input:nth-of-type(2) { grid-column: 1 / 3; } }
+
+/* step bar + wizard */
+.stepbar { list-style: none; display: grid; grid-template-columns: repeat(6, 1fr); gap: .4rem; padding: 0; margin: .8rem 0; }
+.stepbar li button { width: 100%; display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .3rem; border: 1px solid var(--line); background: #fff; border-radius: 12px; cursor: pointer; font-family: inherit; color: var(--ink-2); }
+.stepbar li button small { font-size: .68rem; color: var(--muted, #6b7280); text-align: center; min-height: 1.6em; }
+.stepbar li button:disabled { opacity: .45; cursor: not-allowed; }
+.stepbar .dot { width: 26px; height: 26px; border-radius: 50%; background: #eceff6; display: inline-flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; }
+.stepbar .completed button { border-color: #86efac; background: #f0fdf4; } .stepbar .completed .dot { background: #22c55e; color: #fff; }
+.stepbar .now button { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.18); } .stepbar .now .dot { background: #6366f1; color: #fff; }
+.stepbar .blocked button { border-color: #fecdd3; background: #fff1f2; }
+.wizard h4 { margin: 1rem 0 .4rem; } .wizard .todo { color: #b45309; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: .5rem .8rem .5rem 1.6rem; margin: .5rem 0; font-size: .85rem; }
+.wizard .savebar { margin-top: 1rem; display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+@media (max-width: 700px) { .stepbar { grid-template-columns: repeat(3, 1fr); } }

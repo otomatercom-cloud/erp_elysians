@@ -4,8 +4,8 @@ import { useState } from 'react';
 type Step = { key: string; label: string; status: 'completed' | 'current' | 'pending' | 'blocked'; detail?: string };
 const BADGE = { completed: 'Done', current: 'In progress', pending: 'Pending', blocked: 'Blocked' } as const;
 
-export function Checklist({ steps }: { steps: Step[] | false }) {
-  const [open, setOpen] = useState(true);
+export function Checklist({ steps, defaultOpen = true }: { steps: Step[] | false; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   if (!steps || !steps.length) return null;
   const done = steps.filter((s) => s.status === 'completed').length;
   const pct = Math.round((done * 100) / steps.length);
