@@ -41,6 +41,8 @@ export function actionsFor(model: string, rec: any): Act[] {
     for (const [method, spec] of Object.entries(s.actions)) {
       const field = FIELD_OVERRIDE[method] && model === 'otm.estimate' ? FIELD_OVERRIDE[method] : s.stateField;
       if (!spec.from.includes(rec[field])) continue;
+      // a discount approval only makes sense when a discount was actually entered
+      if (model === 'otm.estimate' && method === 'action_request_discount' && !(Number(rec.discount_value) > 0)) continue;
       if (model === 'otm.expense') {
         const flag = ({ action_head_approve: 'can_head_approve', action_director_approve: 'can_director_approve', action_reject: 'can_reject', action_pay: 'can_pay', action_submit: 'can_owner_edit', action_cancel: 'can_owner_edit' } as Record<string, string>)[method];
         if (flag && rec[flag] === false) continue;
