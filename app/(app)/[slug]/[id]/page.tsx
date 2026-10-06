@@ -29,7 +29,7 @@ export default function DetailPage() {
 
   const fields = useMemo(() => {
     if (!cfg) return [];
-    return [...new Set([...cfg.sections.flatMap((s) => s.fields), ...stateFieldsFor(cfg.model), 'display_name', ...(cfg.tracker ? ['otm_stage_tracker'] : [])])];
+    return [...new Set([...cfg.sections.flatMap((s) => s.fields), ...stateFieldsFor(cfg.model), ...(cfg.also || []), 'display_name', ...(cfg.tracker ? ['otm_stage_tracker'] : [])])];
   }, [cfg]);
 
   const load = useCallback(async () => {

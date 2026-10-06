@@ -7,8 +7,8 @@ import { Spinner, useToast } from './ui';
 type Section = { title: string; fields: string[] };
 
 /** Generic form: labels, types and selections are read from Odoo, so it works for every model. */
-export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday }: {
-  prefillToday?: string[]; model: string; sections: Section[]; record?: any; defaults?: Record<string, any>; mode: 'edit' | 'create';
+export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday, extraPayload, beforeSave }: {
+  extraPayload?: Record<string, any>; beforeSave?: (vals: Record<string, any>) => string | null; prefillToday?: string[]; model: string; sections: Section[]; record?: any; defaults?: Record<string, any>; mode: 'edit' | 'create';
   onSaved: (id: number) => void; onDirty?: (d: boolean) => void;
 }) {
   const [defs, setDefs] = useState<Record<string, FieldDef> | null>(null);
@@ -79,6 +79,9 @@ export function RecordForm({ model, sections, record, defaults, mode, onSaved, o
         const payload: Record<string, any> = {};
         for (const n of names) if (defs![n] && !defs![n].readonly && vals[n] !== false && vals[n] !== '' ) payload[n] = toWire(defs![n], vals[n]);
         for (const [k, x] of Object.entries(defaults || {})) payload[k] = x;
+        const problem = beforeSave?.(vals);
+        if (problem) throw new Error(problem);
+        Object.assign(payload, extraPayload || {});
         const missing = names.filter((n) => defs![n]?.required && !defs![n].readonly && (vals[n] === false || vals[n] === '' || vals[n] === undefined) && payload[n] === undefined);
         if (missing.length) throw new Error('Please fill: ' + missing.map((n) => defs![n].string).join(', '));
         const id = await rpc<number>(model, 'create', [payload]);

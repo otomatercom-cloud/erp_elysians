@@ -73,7 +73,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const on = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
   const Ico = ({ k }: { k: string }) => { const I = ICONS[k]; return I ? <I size={17} strokeWidth={1.9} /> : null; };
   const current = CONFIG.find((c) => path.startsWith('/' + c.slug));
-  const crumb = path === '/' ? 'Dashboard' : path.startsWith('/board') ? 'Project board' : path.startsWith('/customers') ? 'Customer 360' : current?.title || '';
+  const crumb = path === '/' ? 'Dashboard' : path.startsWith('/board') ? 'Project board' : path.startsWith('/customers') ? 'Customer 360' : path.startsWith('/notes') ? 'My Notes' : current?.title || '';
   const initials = user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   return (
     <div className="shell">
@@ -81,6 +81,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <nav className={`side ${menu ? 'open' : ''}`}>
         <div className="brand"><Logo height={36} name={process.env.NEXT_PUBLIC_APP_NAME || 'otomater'} sub="Sales & Project Lifecycle" /></div>
         <Link href="/" className={on('/') ? 'on' : ''}><Ico k="dashboard" />Dashboard</Link>
+        <Link href="/notes" className={on('/notes') ? 'on' : ''}><Ico k="notes" />My Notes</Link>
         {!allowed && <div className="side-skel"><i /><i /><i /><i /><i /><i /></div>}
         {allowed && GROUPS.map((g) => {
           const items = CONFIG.filter((c) => c.group === g && (!allowed || allowed.has(c.model)));

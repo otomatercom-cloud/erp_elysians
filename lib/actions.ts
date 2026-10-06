@@ -17,7 +17,7 @@ const LABELS: Record<string, string> = {
   action_otm_resume: 'Resume', action_skip: 'Skip', action_pass: 'Pass', action_fail: 'Fail', action_assign: 'Assign',
   action_fix: 'Mark fixed', action_deploy: 'Deploy', action_verify: 'Verify', action_report_issue: 'Report issue',
   action_rollback: 'Roll back', action_send_estimate: 'Send renewal estimate', action_confirm_payment: 'Confirm payment',
-  action_renew: 'Renew', action_publish: 'Publish', action_unpublish: 'Unpublish',
+  action_renew: 'Renew', action_head_approve: 'Approve (Sales Head)', action_director_approve: 'Approve (Director)', action_publish: 'Publish', action_unpublish: 'Unpublish',
 };
 const DANGER = new Set(['action_cancel', 'action_mark_lost', 'action_reject', 'action_reject_discount', 'action_rollback', 'action_reverse', 'action_fail', 'action_no_show', 'action_report_issue']);
 const GHOST = new Set(['action_reopen', 'action_reset_draft', 'action_skip', 'action_return', 'action_revise', 'action_hold']);
@@ -40,6 +40,10 @@ export function actionsFor(model: string, rec: any): Act[] {
     for (const [method, spec] of Object.entries(s.actions)) {
       const field = FIELD_OVERRIDE[method] && model === 'otm.estimate' ? FIELD_OVERRIDE[method] : s.stateField;
       if (!spec.from.includes(rec[field])) continue;
+      if (model === 'otm.expense') {
+        const flag = ({ action_head_approve: 'can_head_approve', action_director_approve: 'can_director_approve', action_reject: 'can_reject', action_pay: 'can_pay', action_submit: 'can_owner_edit', action_cancel: 'can_owner_edit' } as Record<string, string>)[method];
+        if (flag && rec[flag] === false) continue;
+      }
       if (rec._hide?.includes(method)) continue; // hidden by a page-level rule (e.g. required stage cannot be skipped)
       out.push({ method, label: labelOf(method), reason: s.reason.includes(method), tone: DANGER.has(method) ? 'danger' : GHOST.has(method) ? 'ghost' : 'primary' });
     }

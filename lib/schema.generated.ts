@@ -1,6 +1,64 @@
 // generated from the Odoo module state-transition matrices (otm.*)
 export type Schema = Record<string, {stateField:string; states:Record<string,string>; reason:string[]; actions:Record<string,{from:string[]; system:boolean}>}>;
 export const SCHEMA: Schema = {
+ "otm.expense": {
+  "stateField": "state",
+  "states": {
+   "draft": "Draft",
+   "submitted": "Pending Sales Head",
+   "head_approved": "Pending Director",
+   "director_approved": "With Finance",
+   "paid": "Paid",
+   "rejected": "Rejected",
+   "cancelled": "Cancelled"
+  },
+  "reason": [
+   "action_reject"
+  ],
+  "actions": {
+   "action_submit": {
+    "from": [
+     "draft",
+     "rejected"
+    ],
+    "system": false
+   },
+   "action_head_approve": {
+    "from": [
+     "submitted"
+    ],
+    "system": false
+   },
+   "action_director_approve": {
+    "from": [
+     "head_approved"
+    ],
+    "system": false
+   },
+   "action_reject": {
+    "from": [
+     "submitted",
+     "head_approved",
+     "director_approved"
+    ],
+    "system": false
+   },
+   "action_pay": {
+    "from": [
+     "director_approved"
+    ],
+    "system": false
+   },
+   "action_cancel": {
+    "from": [
+     "draft",
+     "submitted",
+     "rejected"
+    ],
+    "system": false
+   }
+  }
+ },
  "otm.client.integration": {
   "stateField": "status",
   "states": {

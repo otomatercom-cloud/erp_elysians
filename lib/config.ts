@@ -10,6 +10,7 @@ export type Cfg = {
   columns: string[]; search: string[]; sections: { title: string; fields: string[] }[];
   create?: string[]; tabs?: Tab[]; tracker?: boolean; extra?: Extra[]; order?: string; stateField?: string;
   prefillToday?: string[]; // date fields suggested as today when empty (user still presses Save)
+  also?: string[]; // extra fields always read with the record (UI hints)
   domain?: any[]; // always applied: keeps Odoo's own (non-sales) records out of the list
 };
 
@@ -108,6 +109,16 @@ export const CONFIG: Cfg[] = [
       { title: 'Commission', fields: ['deal_id', 'sales_head_id', 'sales_team_id', 'customer_id', 'service_id', 'trigger', 'approval_required'] },
       { title: 'Amounts', fields: ['base_amount', 'additional_amount', 'commission_percentage', 'commission_amount'] },
       { title: 'Dates', fields: ['earned_date', 'approved_date', 'paid_date', 'notes'] },
+    ],
+  },
+  {
+    slug: 'expenses', model: 'otm.expense', title: 'Expenses', singular: 'Expense', group: 'Finance', tracker: false,
+    also: ['can_head_approve', 'can_director_approve', 'can_reject', 'can_pay', 'can_owner_edit', 'bill_required', 'bill_filename'],
+    columns: ['name', 'expense_date', 'employee_id', 'category_id', 'title', 'amount', 'state'], search: ['name', 'title', 'employee_id'], order: 'id desc',
+    create: ['title', 'category_id', 'amount', 'expense_date', 'bill', 'description'],
+    sections: [
+      { title: 'Expense', fields: ['title', 'category_id', 'amount', 'expense_date', 'employee_id', 'sales_team_id', 'bill', 'description'] },
+      { title: 'Approvals', fields: ['head_approved_by_id', 'head_approved_date', 'director_approved_by_id', 'director_approved_date', 'payment_reference', 'paid_by_id', 'paid_date', 'reject_reason', 'rejected_by_id'] },
     ],
   },
   {
