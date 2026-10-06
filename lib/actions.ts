@@ -26,7 +26,8 @@ const FIELD_OVERRIDE: Record<string, string> = {
   action_request_discount: 'discount_state', action_approve_discount: 'discount_state', action_reject_discount: 'discount_state',
 };
 // these need no reason even though the backend accepts one
-const OPTIONAL_REASON = new Set(['action_lock_deal']);
+const OPTIONAL_REASON = new Set<string>(); // Odoo requires a reason to lock a deal, so the popup must ask for it
+export const DEFAULT_REASON: Record<string, string> = { action_lock_deal: 'Customer approved the estimate' };
 
 export function labelOf(method: string) {
   return LABELS[method] || method.replace(/^action_(otm_)?/, '').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());

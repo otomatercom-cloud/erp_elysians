@@ -17,7 +17,7 @@ export type Cfg = {
 
 export const CONFIG: Cfg[] = [
   {
-    slug: 'leads', model: 'otm.lead', title: 'Leads', singular: 'Lead', group: 'Sales', tracker: true, also: ['service_count', 'stage'],
+    slug: 'leads', model: 'otm.lead', title: 'Leads', singular: 'Lead', group: 'Sales', tracker: true, also: ['service_count', 'stage', 'estimate_count'],
     columns: ['reference', 'name', 'customer_id', 'sales_team_id', 'salesperson_id', 'lead_quality', 'expected_budget', 'followup_date', 'stage'],
     search: ['name', 'reference', 'company_name', 'contact_number'], order: 'id desc',
     create: ['name', 'customer_id', 'company_name', 'contact_number', 'whatsapp_number', 'email', 'location', 'lead_source_id',
@@ -36,7 +36,7 @@ export const CONFIG: Cfg[] = [
     ],
     extra: [
       { method: 'action_create_customer', label: 'Create customer', when: (r) => !r.customer_id && !['won', 'lost'].includes(r.stage), tone: 'ghost' },
-      { method: 'action_create_estimate', label: 'Create estimate', when: (r) => ['estimate', 'negotiation'].includes(r.stage) },
+      { method: 'action_create_estimate', label: 'Create estimate', when: (r) => ['estimate', 'negotiation'].includes(r.stage) && !r.estimate_count }, // one estimate per lead; change it with Revise on the estimate
     ],
   },
   {

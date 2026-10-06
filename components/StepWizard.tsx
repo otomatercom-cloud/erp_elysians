@@ -128,7 +128,7 @@ function StepPopup({ id, rec, onClose, onDone, goto }: { id: string; rec: any; o
 function CreateEstimate({ rec, onDone }: { rec: any; onDone: () => void }) {
   const router = useRouter();
   const { push } = useToast();
-  if (!['estimate', 'negotiation'].includes(rec.stage)) return null;
+  if (!['estimate', 'negotiation'].includes(rec.stage) || rec.estimate_count) return null;
   return <button className="btn primary" onClick={async () => { try { const r: any = await rpc('otm.lead', 'action_create_estimate', [[rec.id]]); push('Estimate created'); onDone(); if (r?.res_id) router.push(`/estimates/${r.res_id}`); } catch (e: any) { push(e.message, 'err'); } }}>Create estimate</button>;
 }
 

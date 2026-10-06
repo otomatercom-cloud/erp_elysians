@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { actionsFor, Act } from '@/lib/actions';
+import { actionsFor, Act, DEFAULT_REASON } from '@/lib/actions';
 import { BY_MODEL } from '@/lib/config';
 import { rpc } from '@/lib/odoo';
 import { Modal, useToast } from './ui';
@@ -42,13 +42,13 @@ export function ActionButtons({ model, rec, onDone, dirty, small }: { model: str
       <span className="actions">
         {acts.map((a, i) => (
           <button key={a.method} disabled={busy} className={`btn ${a.tone} ${small ? 'sm' : ''} ${i === nextIdx ? 'next' : ''}`} title={i === nextIdx ? 'Suggested next step' : undefined}
-            onClick={(e) => { e.stopPropagation(); a.reason ? setAsk(a) : go(a); }}>{i === nextIdx ? `Next: ${a.label} →` : a.label}</button>
+            onClick={(e) => { e.stopPropagation(); a.reason ? (setReason(DEFAULT_REASON[a.method] || ''), setAsk(a)) : go(a); }}>{i === nextIdx ? `Next: ${a.label} →` : a.label}</button>
         ))}
       </span>
       {ask && (
         <Modal title={ask.label} onClose={() => setAsk(null)}>
           <label className="field wide"><span>Reason</span>
-            <textarea autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="A reason is required for this action" />
+            <textarea autoFocus rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={ask.method === 'action_lock_deal' ? 'Why is this deal being locked? (required)' : 'A reason is required for this action'} />
           </label>
           <div className="savebar">
             <button className={`btn ${ask.tone}`} disabled={busy || !reason.trim()} onClick={() => go(ask, reason.trim())}>{ask.label}</button>
