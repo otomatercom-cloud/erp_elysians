@@ -85,7 +85,6 @@ function StepPopup({ id, rec, onClose, onDone, goto }: { id: string; rec: any; o
   const missing: string[] = [];
   if (id === 'lead') {
     if (!rec.customer_id) missing.push('Customer is not linked (optional, but needed for the estimate).');
-    if (!String(rec.requirement_description || '').trim()) missing.push('Describe the customer requirement.');
     if (!rec.service_count) missing.push('Add at least one service.');
   }
   const leadAct = LEAD_ACTS.map(find).find(Boolean);

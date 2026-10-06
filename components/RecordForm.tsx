@@ -7,7 +7,8 @@ import { Spinner, useToast } from './ui';
 type Section = { title: string; fields: string[] };
 
 /** Generic form: labels, types and selections are read from Odoo, so it works for every model. */
-export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday, extraPayload, beforeSave, beforeCreate }: {
+export function RecordForm({ model, sections, record, defaults, mode, onSaved, onDirty, prefillToday, extraPayload, beforeSave, beforeCreate, belowFields, fillIfEmpty }: {
+  belowFields?: React.ReactNode; fillIfEmpty?: Record<string, any>;
   beforeCreate?: () => Promise<void>;
   extraPayload?: Record<string, any>; beforeSave?: (vals: Record<string, any>) => string | null; prefillToday?: string[]; model: string; sections: Section[]; record?: any; defaults?: Record<string, any>; mode: 'edit' | 'create';
   onSaved: (id: number) => void; onDirty?: (d: boolean) => void;
@@ -82,6 +83,7 @@ export function RecordForm({ model, sections, record, defaults, mode, onSaved, o
         for (const [k, x] of Object.entries(defaults || {})) payload[k] = x;
         const problem = beforeSave?.(vals);
         if (problem) throw new Error(problem);
+        for (const [k, x] of Object.entries(fillIfEmpty || {})) if (payload[k] === undefined) payload[k] = x;
         Object.assign(payload, extraPayload || {});
         const missing = names.filter((n) => defs![n]?.required && !defs![n].readonly && (vals[n] === false || vals[n] === '' || vals[n] === undefined) && payload[n] === undefined);
         if (missing.length) throw new Error('Please fill: ' + missing.map((n) => defs![n].string).join(', '));
@@ -122,6 +124,7 @@ export function RecordForm({ model, sections, record, defaults, mode, onSaved, o
           </fieldset>
         );
       })}
+      {belowFields}
       {(mode === 'create' || dirtyKeys.length > 0) && (
         <div className="savebar">
           <button className="btn primary" disabled={busy} onClick={save}>{busy ? 'Saving…' : mode === 'create' ? 'Create' : 'Save changes'}</button>

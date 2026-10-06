@@ -27,6 +27,7 @@ export default function DetailPage() {
   const [selDef, setSelDef] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState(0);
+  const [ver, setVer] = useState(0);
 
   const fields = useMemo(() => {
     if (!cfg) return [];
@@ -41,6 +42,7 @@ export default function DetailPage() {
       const names = fields.filter((f) => d[f] && d[f].type !== 'binary');
       fields.filter((f) => d[f]?.type === 'binary').forEach((f) => { const fn = FILENAME_FIELD(f); if (d[fn]) names.push(fn); });
       setRec(await readRecord(cfg.model, rid, names));
+      setVer((v) => v + 1);
     } catch (e: any) { push(e.message, 'err'); }
   }, [cfg, rid, fields, push]);
   useEffect(() => { setRec(null); load(); }, [load]);
@@ -81,7 +83,7 @@ export default function DetailPage() {
               <Related key={`${cfg.slug}-${tab}-${rid}`} tab={tabs[tab]} parentId={rid} parent={rec} onChange={load} />
             </section>
           )}
-          <RecordForm model={cfg.model} mode="edit" record={rec} sections={cfg.sections} onSaved={load} onDirty={setDirty} prefillToday={cfg.prefillToday} />
+          <RecordForm key={ver} model={cfg.model} mode="edit" record={rec} sections={cfg.sections} onSaved={load} onDirty={setDirty} prefillToday={cfg.prefillToday} />
         </div>
         <Chatter key={chatKey} model={cfg.model} id={rid} />
       </div>

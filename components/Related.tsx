@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Tab } from '@/lib/config';
 import { stateFieldOf, stateFieldsFor } from '@/lib/actions';
-import { FieldDef, fieldsGet, searchRead, withM2MNames } from '@/lib/odoo';
+import { FieldDef, fieldsGet, readRecord, rpc, searchRead, withM2MNames } from '@/lib/odoo';
 import { fmt } from '@/lib/util';
 import { ActionButtons } from './ActionBar';
 import { RecordForm } from './RecordForm';
@@ -20,6 +20,7 @@ export function Related({ tab, parentId, parent, onChange }: { tab: Tab; parentI
   const [rows, setRows] = useState<any[] | null>(null);
   const [defs, setDefs] = useState<Record<string, FieldDef>>({});
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
   const value = tab.parentField ? parent?.[tab.parentField]?.[0] : parentId;
   const sf = stateFieldOf(tab.model);
   const isStage = tab.model === 'otm.project.stage.line';
@@ -64,11 +65,15 @@ export function Related({ tab, parentId, parent, onChange }: { tab: Tab; parentI
       </div>
       <div className="table-wrap">
         <table className="tbl">
-          <thead><tr>{cols.map((c) => <th key={c}>{c === 'sequence' && isStage ? 'Stage' : defs[c].string}</th>)}{tab.rowActions && <th />}</tr></thead>
+          <thead><tr>{cols.map((c) => <th key={c}>{c === 'sequence' && isStage ? 'Stage' : defs[c].string}</th>)}{(tab.rowActions || tab.editable) && <th />}</tr></thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={r.id} className={tab.link ? 'click' : ''} onClick={() => tab.link && router.push(`/${tab.link}/${r.id}`)}>
                 {cols.map((c) => <td key={c}>{c === 'sequence' && isStage ? <b className="stage-no">{i + 1}</b> : <Cell name={c} def={defs[c]} value={r[c]} stateField={sf} />}</td>)}
+                {tab.editable && <td className="right nowrap">
+                  <button className="btn ghost sm" onClick={async () => { try { setEditing(await readRecord(tab.model, r.id, [...new Set([...(tab.create || []), ...Object.keys(r).filter((k) => defs[k])])].filter((f) => defs[f] && defs[f].type !== 'binary'))); } catch (e: any) { push(e.message, 'err'); } }}>✎ Edit</button>{' '}
+                  <button className="btn danger sm" onClick={async () => { if (!confirm('Remove this line?')) return; try { await rpc(tab.model, 'unlink', [[r.id]]); push('Removed'); load(); onChange?.(); } catch (e: any) { push(e.message, 'err'); } }}>🗑</button>
+                </td>}
                 {tab.rowActions && <td className="right"><ActionButtons model={tab.model} rec={r} onDone={() => { load(); onChange?.(); }} small /></td>}
               </tr>
             ))}
@@ -76,6 +81,12 @@ export function Related({ tab, parentId, parent, onChange }: { tab: Tab; parentI
           </tbody>
         </table>
       </div>
+      {editing && tab.create && (
+        <Modal title={`Edit ${tab.title.replace(/s$/, '')}`} onClose={() => setEditing(null)}>
+          <RecordForm model={tab.model} mode="edit" record={editing} sections={[{ title: 'Details', fields: tab.create }]}
+            onSaved={() => { setEditing(null); load(); onChange?.(); }} />
+        </Modal>
+      )}
       {adding && tab.create && (
         <Modal title={`New ${tab.title.replace(/s$/, '')}`} onClose={() => setAdding(false)}>
           <RecordForm model={tab.model} mode="create" sections={[{ title: 'Details', fields: tab.create }]}

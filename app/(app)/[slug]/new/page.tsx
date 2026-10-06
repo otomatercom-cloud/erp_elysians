@@ -14,7 +14,7 @@ function ServiceLines({ lines, setLines }: { lines: Line[]; setLines: (l: Line[]
   const [svcs, setSvcs] = useState<Svc[]>([]);
   useEffect(() => { searchRead('otm.service', [], ['name', 'base_amount'], { order: 'name', limit: 200 }).then(setSvcs).catch(() => setSvcs([])); }, []);
   const upd = (i: number, v: Partial<Line>) => setLines(lines.map((l, k) => (k === i ? { ...l, ...v } : l)));
-  const total = lines.reduce((t, l) => t + (svcs.find((x) => x.id === l.service_id)?.base_amount || 0) * (l.quantity || 0), 0);
+  const total = lines.reduce((t, l) => t + (svcs.find((x) => x.id === l.service_id)?.base_amount || 0), 0);
   return (
     <fieldset className="section">
       <legend>Services required *</legend>
@@ -24,8 +24,7 @@ function ServiceLines({ lines, setLines }: { lines: Line[]; setLines: (l: Line[]
             <option value="">Select service…</option>
             {svcs.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
           </select>
-          <input type="number" min={1} step="any" value={l.quantity} onChange={(e) => upd(i, { quantity: Number(e.target.value) })} title="Quantity" />
-          <input placeholder="Requirement for this service (optional)" value={l.requirement_description} onChange={(e) => upd(i, { requirement_description: e.target.value })} />
+          <input placeholder="Customization needed for this service (optional)" value={l.requirement_description} onChange={(e) => upd(i, { requirement_description: e.target.value })} />
           <button type="button" className="icon-btn" title="Remove" onClick={() => setLines(lines.filter((_, k) => k !== i))}><Trash2 size={16} /></button>
         </div>
       ))}
@@ -48,10 +47,11 @@ export default function NewPage() {
   return (
     <div>
       <div className="page-head"><h1>New {cfg.singular.toLowerCase()}</h1></div>
-      {isLead && <ServiceLines lines={lines} setLines={setLines} />}
       <RecordForm model={cfg.model} mode="create" sections={[{ title: 'Details', fields: cfg.create }]} defaults={defaults}
-        extraPayload={isLead ? { service_line_ids: lines.filter((l) => l.service_id).map((l) => [0, 0, { service_id: l.service_id, quantity: l.quantity || 1, requirement_description: l.requirement_description || false }]) } : undefined}
-        beforeSave={isLead ? (v) => (!String(v.requirement_description || '').trim() ? 'Please describe the customer requirement.' : !lines.some((l) => l.service_id) ? 'Please add at least one service.' : null) : undefined}
+        fillIfEmpty={isLead ? { requirement_description: 'No customization required' } : undefined}
+        extraPayload={isLead ? { service_line_ids: lines.filter((l) => l.service_id).map((l) => [0, 0, { service_id: l.service_id, quantity: 1, requirement_description: l.requirement_description || false }]) } : undefined}
+        beforeSave={isLead ? () => (!lines.some((l) => l.service_id) ? 'Please add at least one service.' : null) : undefined}
+        belowFields={isLead ? <ServiceLines lines={lines} setLines={setLines} /> : undefined}
         onSaved={(id) => router.replace(`/${cfg.slug}/${id}`)} />
     </div>
   );

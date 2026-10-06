@@ -2,7 +2,8 @@
 // state buttons come from the module's transition matrices (schema.generated.ts) - nothing is hard-coded twice.
 export type Tab = {
   title: string; model: string; field: string; columns: string[]; create?: string[];
-  rowActions?: boolean; top?: boolean; link?: string; parentField?: string; // parentField: read this field of the parent (many2one) instead of its id
+  rowActions?: boolean; editable?: boolean; // editable: rows can be changed / removed in place (Odoo still blocks it when the record is locked)
+  top?: boolean; link?: string; parentField?: string; // parentField: read this field of the parent (many2one) instead of its id
 };
 export type Extra = { method: string; label: string; when: (r: any) => boolean; tone?: 'primary' | 'danger' | 'ghost'; reason?: boolean };
 export type Cfg = {
@@ -28,7 +29,7 @@ export const CONFIG: Cfg[] = [
       { title: 'Lost', fields: ['lost_reason', 'lost_description', 'lost_date', 'lost_by_id'] },
     ],
     tabs: [
-      { title: 'Services', model: 'otm.lead.service.line', field: 'lead_id', columns: ['service_id', 'quantity', 'base_unit_price', 'base_subtotal', 'requirement_description'], create: ['service_id', 'quantity', 'base_unit_price', 'requirement_description'] },
+      { title: 'Services', model: 'otm.lead.service.line', field: 'lead_id', columns: ['service_id', 'quantity', 'base_unit_price', 'base_subtotal', 'requirement_description'], create: ['service_id', 'quantity', 'base_unit_price', 'requirement_description'], editable: true },
       { title: 'Demos', model: 'otm.demo', field: 'lead_id', columns: ['name', 'demo_date', 'start_time', 'demo_person_id', 'status'], create: ['demo_date', 'start_time', 'end_time', 'demo_person_id', 'notes'], link: 'demos', rowActions: true },
       { title: 'Estimates', model: 'otm.estimate', field: 'lead_id', columns: ['estimate_number', 'revision_number', 'total_amount', 'status'], link: 'estimates' },
       { title: 'Deals', model: 'otm.deal', field: 'lead_id', columns: ['name', 'total_amount', 'status'], link: 'deals' },
@@ -58,8 +59,8 @@ export const CONFIG: Cfg[] = [
       { title: 'Notes', fields: ['notes'] },
     ],
     tabs: [
-      { title: 'Services', model: 'otm.estimate.line', field: 'estimate_id', columns: ['service_id', 'description', 'quantity', 'base_unit_price', 'additional_amount', 'selling_unit_price', 'subtotal'], create: ['service_id', 'description', 'quantity', 'base_unit_price', 'additional_amount'] },
-      { title: 'Customizations', model: 'otm.estimate.customization', field: 'estimate_id', columns: ['customization_type', 'description', 'percentage', 'fixed_amount', 'calculated_amount'], create: ['customization_type', 'description', 'percentage', 'fixed_amount'] },
+      { title: 'Services', model: 'otm.estimate.line', field: 'estimate_id', columns: ['service_id', 'description', 'quantity', 'base_unit_price', 'additional_amount', 'selling_unit_price', 'subtotal'], create: ['service_id', 'description', 'quantity', 'base_unit_price', 'additional_amount'], editable: true },
+      { title: 'Customizations', model: 'otm.estimate.customization', field: 'estimate_id', columns: ['customization_type', 'description', 'percentage', 'fixed_amount', 'calculated_amount'], create: ['customization_type', 'description', 'percentage', 'fixed_amount'], editable: true },
     ],
     extra: [
       { method: 'action_recalculate', label: 'Recalculate', when: (r) => r.status === 'draft', tone: 'ghost' },
