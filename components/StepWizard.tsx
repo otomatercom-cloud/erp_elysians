@@ -61,12 +61,13 @@ export function StepWizard({ rec, onDone }: { rec: any; onDone: () => void }) {
         })}
       </ol>
       {closed && <p className="muted">This lead is {rec.stage}. Use Reopen in the toolbar if it needs to continue.</p>}
+      {!closed && cur >= 0 && <StepPopup key={GROUPS[cur].id} inline id={GROUPS[cur].id} rec={rec} onClose={() => {}} onDone={done} goto={() => {}} />}
       {open && <StepPopup id={open} rec={rec} onClose={() => setOpen(null)} onDone={done} goto={(id) => setOpen(id)} />}
     </>
   );
 }
 
-function StepPopup({ id, rec, onClose, onDone, goto }: { id: string; rec: any; onClose: () => void; onDone: () => void; goto: (id: string) => void }) {
+function StepPopup({ id, rec, onClose, onDone, goto, inline }: { inline?: boolean; id: string; rec: any; onClose: () => void; onDone: () => void; goto: (id: string) => void }) {
   const router = useRouter();
   const { push } = useToast();
   const [busy, setBusy] = useState(false);
@@ -90,8 +91,10 @@ function StepPopup({ id, rec, onClose, onDone, goto }: { id: string; rec: any; o
   const leadAct = LEAD_ACTS.map(find).find(Boolean);
   const hardMissing = missing.filter((m) => !m.startsWith('Customer'));
 
-  return (
-    <Modal title={`Step: ${title}`} onClose={onClose}>
+  const shell = (children: React.ReactNode) => inline
+    ? <section className="tabs-box focus"><h3>Now: {title}</h3>{children}</section>
+    : <Modal title={`Step: ${title}`} onClose={onClose}>{children}</Modal>;
+  return shell(
       <div className="wizard">
         {id === 'lead' && (
           <>
@@ -112,16 +115,15 @@ function StepPopup({ id, rec, onClose, onDone, goto }: { id: string; rec: any; o
           <>
             <p className="hint">{({ estimate: 'Prepare the estimate for the customer.', deal: 'Lock the deal and get the agreement signed.', payment: 'Receive the advance payment.', project: 'Project delivery: development, QC, deployment, training, final payment and review.' } as Record<string, string>)[id]}</p>
             {id === 'estimate' && <Related tab={tabOf('otm.estimate')} parentId={rec.id} parent={rec} onChange={onDone} />}
-            {id === 'deal' && <Related tab={tabOf('otm.deal')} parentId={rec.id} parent={rec} onChange={onDone} />}
+            {['deal', 'payment', 'project'].includes(id) && <Related tab={tabOf('otm.deal')} parentId={rec.id} parent={rec} onChange={onDone} />}
             <div className="savebar">
               {id === 'estimate' && (['action_create_estimate'].map((m) => ({ m })).length > 0) && <CreateEstimate rec={rec} onDone={onDone} />}
               {find('action_negotiate') && id === 'estimate' && <button className="btn" disabled={busy} onClick={() => run(find('action_negotiate')!)}>{LABEL.action_negotiate}</button>}
-              <span className="muted">Full guided popups for this step come next; use the record page for now.</span>
+              {['payment', 'project'].includes(id) && <span className="muted">Open the deal above to continue with payments and the project.</span>}
             </div>
           </>
         )}
       </div>
-    </Modal>
   );
 }
 

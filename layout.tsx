@@ -1,0 +1,25 @@
+import './globals.css';
+import type { ReactNode } from 'react';
+import { ToastProvider } from '@/components/ui';
+
+export const viewport = { themeColor: '#4f46e5' };
+
+export const metadata = {
+  title: 'Otomater · Sales & Project Lifecycle', description: 'Lead to delivery, in one place',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Otomater', statusBarStyle: 'default' as const },
+  icons: { icon: '/icon-192.png', apple: '/icon-192.png' },
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+      </head>
+      <body><ToastProvider>{children}</ToastProvider></body>
+    </html>
+  );
+}
